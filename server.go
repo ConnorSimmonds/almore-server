@@ -45,28 +45,28 @@ Loop:
 			fmt.Println("Error while reading from client.")
 			break
 		}
+		//Getting a response from the client
 		clientRead.Reset()
 		clientRead.Write(byteArray)
-		clientString, err := clientRead.ReadString(10)
-		if err != nil {
-			fmt.Println("Error while parsing string - exiting.")
+		clientCode := clientRead.Next(1)
+		switch clientCode {
+		case []byte{0}:
+			sendMessage(clientWrite, conn, "Quitting...\n")
+			break Loop
+		case []byte{1}:
+			fmt.Println("Received 'ping' from " + conn.RemoteAddr().String())
+			sendMessage(clientWrite, conn, "pong\n")
 			break
-		} else {
-			switch clientString {
-			case "quit\n":
-				sendMessage(clientWrite, conn, "Quitting...\n")
-				break Loop
-			case "ping\n":
-				fmt.Println("Received 'ping' from " + conn.RemoteAddr().String())
-				sendMessage(clientWrite, conn, "pong\n")
-				break
-			}
 		}
 	}
-
 }
 
 func sendMessage(buffer bytes.Buffer, conn net.Conn, message string) {
 	buffer.Write([]byte(message))
+	conn.Write(buffer.Bytes())
+}
+
+func sendPacket(buffer bytes.Buffer, conn net.Conn, opCode []byte) { //TODO: figure out if there's a better way to pass in opCodes
+	buffer.Write(opCode)
 	conn.Write(buffer.Bytes())
 }
