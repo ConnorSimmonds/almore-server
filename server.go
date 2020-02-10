@@ -49,13 +49,13 @@ Loop:
 		clientRead.Reset()
 		clientRead.Write(byteArray)
 		clientCode := clientRead.Next(1)
-		switch clientCode {
-		case []byte{0}:
-			sendMessage(clientWrite, conn, "Quitting...\n")
+		switch clientCode[0] {
+		case 2:
+			sendPacket(clientWrite, conn, []byte{2})
 			break Loop
-		case []byte{1}:
+		case 1:
 			fmt.Println("Received 'ping' from " + conn.RemoteAddr().String())
-			sendMessage(clientWrite, conn, "pong\n")
+			sendPacket(clientWrite, conn, []byte{1})
 			break
 		}
 	}
@@ -66,7 +66,7 @@ func sendMessage(buffer bytes.Buffer, conn net.Conn, message string) {
 	conn.Write(buffer.Bytes())
 }
 
-func sendPacket(buffer bytes.Buffer, conn net.Conn, opCode []byte) { //TODO: figure out if there's a better way to pass in opCodes
-	buffer.Write(opCode)
+func sendPacket(buffer bytes.Buffer, conn net.Conn, packetDetails []byte) {
+	buffer.Write(packetDetails)
 	conn.Write(buffer.Bytes())
 }
