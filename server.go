@@ -1,9 +1,9 @@
 package main
 
 import (
-	User "./user"
 	"bytes"
 	"fmt"
+	user "github.com/ConnorSimmonds/server/user"
 	"net"
 	"os"
 )
@@ -34,9 +34,10 @@ func handleConnection(conn net.Conn) {
 	//Simple test to receive and send to a client
 	var clientRead bytes.Buffer
 	var clientWrite bytes.Buffer
+	var userID uint16
 	byteArray := make([]byte, 1024)
+	userID = userID
 
-	sendMessage(clientWrite, conn, "Hello World\n")
 	fmt.Println("Waiting for response from " + conn.RemoteAddr().String())
 	defer conn.Close()
 Loop:
@@ -50,10 +51,11 @@ Loop:
 		clientRead.Reset()
 		clientRead.Write(byteArray)
 		clientCode := clientRead.Next(1)
+
 		//Note that this just handles receiving data - the actual proper logic is done elsewhere.
 		switch clientCode[0] {
 		case 0:
-			User.InitUser(clientRead.Next(1)[0])
+			userID = user.InitUser(clientRead.Next(8))
 			break
 		case 2:
 			sendPacket(clientWrite, conn, []byte{2})
@@ -66,12 +68,7 @@ Loop:
 	}
 }
 
-func sendMessage(buffer bytes.Buffer, conn net.Conn, message string) {
-	buffer.Write([]byte(message))
-	conn.Write(buffer.Bytes())
-}
-
 func sendPacket(buffer bytes.Buffer, conn net.Conn, packetDetails []byte) {
 	buffer.Write(packetDetails)
-	conn.Write(buffer.Bytes())
+	_, _ = conn.Write(buffer.Bytes())
 }
