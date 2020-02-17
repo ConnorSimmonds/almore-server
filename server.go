@@ -1,6 +1,7 @@
 package main
 
 import (
+	User "./user"
 	"bytes"
 	"fmt"
 	"net"
@@ -49,7 +50,11 @@ Loop:
 		clientRead.Reset()
 		clientRead.Write(byteArray)
 		clientCode := clientRead.Next(1)
+		//Note that this just handles receiving data - the actual proper logic is done elsewhere.
 		switch clientCode[0] {
+		case 0:
+			User.InitUser(clientRead.Next(1)[0])
+			break
 		case 2:
 			sendPacket(clientWrite, conn, []byte{2})
 			break Loop
