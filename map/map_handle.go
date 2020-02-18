@@ -7,7 +7,7 @@ import (
 )
 
 //Updates the map at the position of arguments x, y with the value of argument value
-func UpdateMap(x int, y int, value int) {
+func UpdateMap(x int, y int, value int, userID uint16) {
 
 }
 

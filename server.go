@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	maplib "github.com/ConnorSimmonds/server/map"
 	user "github.com/ConnorSimmonds/server/user"
 	"net"
 	"os"
@@ -64,6 +65,11 @@ Loop:
 			fmt.Println("Received 'ping' from " + conn.RemoteAddr().String())
 			sendPacket(clientWrite, conn, []byte{1})
 			break
+		case 10:
+			var x int
+			var y int
+			var value int
+			maplib.UpdateMap(x, y, value, userID)
 		}
 	}
 }
