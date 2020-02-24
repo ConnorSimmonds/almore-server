@@ -35,9 +35,13 @@ func handleConnection(conn net.Conn) {
 	//Simple test to receive and send to a client
 	var clientRead bytes.Buffer
 	var clientWrite bytes.Buffer
+
+	//Some basic values for gameplay purposes
 	var userID uint16
+	var dungeonID uint16
+	var mapNum uint16
+	var currentMap *os.File
 	byteArray := make([]byte, 1024)
-	userID = userID
 
 	fmt.Println("Waiting for response from " + conn.RemoteAddr().String())
 	defer conn.Close()
@@ -69,7 +73,10 @@ Loop:
 			var x int
 			var y int
 			var value int
-			maplib.UpdateMap(x, y, value, userID)
+			maplib.UpdateMap(x, y, value, currentMap)
+			break
+		case 13:
+			currentMap = maplib.OpenMap(userID, dungeonID, mapNum)
 		}
 	}
 }
