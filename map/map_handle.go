@@ -22,9 +22,9 @@ func OpenMap(userID uint16, dungeonID uint16, mapNum uint16) *os.File {
 	//Now we add our ints into our builder
 	stringBuilder.WriteString(strconv.FormatUint(uint64(userID), 10) + "/" + strconv.FormatUint(uint64(dungeonID), 10) + "_" + strconv.FormatUint(uint64(mapNum), 10) + fileFormat)
 	fmt.Print(stringBuilder.String())
-	file, fileError := os.Open("Maps/1/map1_1.dng")
+	file, fileError := os.OpenFile("Maps/1/map1_1.dng", os.O_RDWR, os.ModePerm)
 	if fileError != nil {
-		//There's been some kind of error, record it in the appropiate debug log (with a timestamp) and then create the map (failsafe)
+		//There's been some kind of error, record it in the appropriate debug log (with a timestamp) and then create the map (failsafe)
 		fmt.Println(fileError.Error())
 		return createMap(stringBuilder.String())
 	} else {
