@@ -19,7 +19,7 @@ For Example, a ping packet will simply be "1" with no other arguments. If it rec
 |Init. Connection|Initializes the connection between the server and client. First part is initialized from the client - after the initial connection, it "logs in" with the User ID.|0|User ID (uint16)
 |Ping|Pings the server.|1|n/a
 |Quit|Closes the connection.|2|n/a
-|Map Update|Updates the map.|10|X , Y, Updated Value
+|Map Update|Updates the map.|10|X (uint8) , Y (uint8), Updated Value (uint8)
 |Map Send|Sends the map file. This will be a byte stream.|11|Map File
 |Map Request|Requests the map file that is stored on the server.|12|n/a
 |Map Open|Tells the server to open the map file which the player is currently in, or in the arguments given.|13|(optional): Dungeon ID (uint16), Map Number (unint16)

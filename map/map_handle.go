@@ -3,6 +3,7 @@
 package _map
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -10,8 +11,12 @@ import (
 )
 
 //Updates the map at the position of arguments x, y with the value of argument value
-func UpdateMap(x int, y int, value int, currentMap *os.File) {
-
+func UpdateMap(x uint8, y uint8, value uint8, currentMap *os.File) error {
+	var width, height uint8
+	if y > height || x > width {
+		return errors.New("x/y out of bounds")
+	}
+	currentMap.WriteAt([]byte{value}, int64((width*y)+x))
 }
 
 //Opens a map, and returns it for later use. If the file doesn't exist, it will create it.

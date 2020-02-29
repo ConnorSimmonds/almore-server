@@ -70,13 +70,18 @@ Loop:
 			sendPacket(clientWrite, conn, []byte{1})
 			break
 		case 10:
-			var x int
-			var y int
-			var value int
-			maplib.UpdateMap(x, y, value, currentMap)
+			//Put values into local variables
+			x := clientRead.Next(1)[0]
+			y := clientRead.Next(1)[0]
+			value := clientRead.Next(1)[0]
+			error := maplib.UpdateMap(x, y, value, currentMap)
+			if error != nil {
+				//we need to inform the client somehow
+			}
 			break
 		case 13:
 			currentMap = maplib.OpenMap(userID, dungeonID, mapNum)
+			break
 		}
 	}
 }
