@@ -16,7 +16,7 @@ For Example, a ping packet will simply be "1" with no other arguments. If it rec
 #Receiving
 | Packet Name | Packet Description | OP Code (Int8)| Arguments
 |-------------|--------------------|---------|----------
-|Init. Connection|Initializes the connection between the server and client. First part is initialized from the client - after the initial connection, it "logs in" with the User ID.|0|User ID (uint16)
+|Init. Connection|Initializes the connection between the server and client. First part is initialized from the client - after the initial connection, it "logs in" with the User ID.|0|User ID (uint32)
 |Ping|Pings the server.|1|n/a
 |Quit|Closes the connection.|2|n/a
 |Map Update|Updates the map.|10|X (uint8) , Y (uint8), Updated Value (uint8)
