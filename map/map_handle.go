@@ -3,7 +3,6 @@
 package _map
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -11,16 +10,12 @@ import (
 )
 
 //Updates the map at the position of arguments x, y with the value of argument value
-func UpdateMap(x uint8, y uint8, value uint8, currentMap *os.File) error {
-	var width, height uint8
-	if y > height || x > width {
-		return errors.New("x/y out of bounds")
-	}
-	currentMap.WriteAt([]byte{value}, int64((width*y)+x))
+func UpdateMap(x uint8, y uint8, value uint8, currentMap *os.File) {
+	currentMap.WriteAt([]byte{value}, 0) //I need to properly set this up - there's going to be issues. It's easy enough to say "go to position x,y"
 }
 
 //Opens a map, and returns it for later use. If the file doesn't exist, it will create it.
-func OpenMap(userID uint16, dungeonID uint16, mapNum uint16) *os.File {
+func OpenMap(userID uint32, dungeonID uint16, mapNum uint16) *os.File {
 	var stringBuilder strings.Builder
 	fileFormat := ".dng"
 	stringBuilder.WriteString("Maps/")

@@ -37,7 +37,7 @@ func handleConnection(conn net.Conn) {
 	var clientWrite bytes.Buffer
 
 	//Some basic values for gameplay purposes
-	var userID uint16
+	var userID uint32
 	var dungeonID uint16
 	var mapNum uint16
 	var currentMap *os.File
@@ -60,10 +60,12 @@ Loop:
 		//Note that this just handles receiving data - the actual proper logic is done elsewhere.
 		switch clientCode[0] {
 		case 0:
-			userID = user.InitUser(clientRead.Next(8))
+			userID = user.InitUser(clientRead.Next(4))
+			fmt.Printf("Found user %d", userID)
 			break
 		case 2:
 			sendPacket(clientWrite, conn, []byte{2})
+			fmt.Printf("Closing connection.")
 			break Loop
 		case 1:
 			fmt.Println("Received 'ping' from " + conn.RemoteAddr().String())
@@ -74,10 +76,7 @@ Loop:
 			x := clientRead.Next(1)[0]
 			y := clientRead.Next(1)[0]
 			value := clientRead.Next(1)[0]
-			error := maplib.UpdateMap(x, y, value, currentMap)
-			if error != nil {
-				//we need to inform the client somehow
-			}
+			maplib.UpdateMap(x, y, value, currentMap)
 			break
 		case 13:
 			currentMap = maplib.OpenMap(userID, dungeonID, mapNum)
