@@ -4,6 +4,7 @@ package _map
 
 import (
 	"fmt"
+	errorLibrary "github.com/ConnorSimmonds/server/errors"
 	"os"
 	"strconv"
 	"strings"
@@ -15,7 +16,7 @@ func UpdateMap(x uint8, y uint8, value uint8, currentMap *os.File) {
 }
 
 //Opens a map, and returns it for later use. If the file doesn't exist, it will create it.
-func OpenMap(userID uint32, dungeonID uint16, mapNum uint16) *os.File {
+func OpenMap(userID uint32, dungeonID uint16, mapNum uint16) (*os.File, *errorLibrary.MapError) {
 	var stringBuilder strings.Builder
 	fileFormat := ".dng"
 	stringBuilder.WriteString("Maps/")
@@ -26,15 +27,16 @@ func OpenMap(userID uint32, dungeonID uint16, mapNum uint16) *os.File {
 	if fileError != nil {
 		//There's been some kind of error, record it in the appropriate debug log (with a timestamp) and then create the map (failsafe)
 		fmt.Println(fileError.Error())
-		return createMap(stringBuilder.String())
+		return nil, errorLibrary.ReturnMapFileError()
 	} else {
-		return file
+		return file, errorLibrary.ReturnMapNil()
 	}
 }
 
 //Creates the map file
-func createMap(filename string) *os.File {
+func CreateMap(filename string, x uint8, y uint8) *os.File {
 	var returnFile *os.File
 	returnFile, _ = os.Create(filename)
+	//We now fill it with dummy characters, and put the x/y values in the header
 	return returnFile //return the file
 }

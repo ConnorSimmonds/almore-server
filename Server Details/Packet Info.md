@@ -23,6 +23,7 @@ For Example, a ping packet will simply be "1" with no other arguments. If it rec
 |Map Send|Sends the map file. This will be a byte stream.|11|Map File
 |Map Request|Requests the map file that is stored on the server.|12|n/a
 |Map Open|Tells the server to open the map file which the player is currently in, or in the arguments given.|13|(optional): Dungeon ID (uint16), Map Number (unint16)
+|Map Create|Tells the server the size of the map. We do not need to resend the  dungeon or floor, as this will always follow Map Open.|14|X (unint8), Y (unint8)
 |Dungeon Update|Updates the current dungeon and floor the player is in.|20|Dungeon ID  (unint16), Map ID  (unint16)|
 |Floor Update|Updates the current floor the player is in.|21|Map ID (uint16)
 
@@ -34,3 +35,4 @@ For Example, a ping packet will simply be "1" with no other arguments. If it rec
 |Quit|Closes the connection.|2|n/a
 |Map Update|Updates the map.|10|X, Y, Updated Value
 |Map Send|Sends the map file to the client.|11|Map File
+|Map Create|Requests the map details so it may create the file|12|n/a
