@@ -91,8 +91,7 @@ Loop:
 
 			break
 		case 14:
-			fmt.Println(filename)
-			currentMap = maplib.CreateMap("Maps/1/map1_1.dng", 5, 5)
+			currentMap = maplib.CreateMap(filename, 5, 5)
 			break
 		}
 	}
