@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	errorLibrary "github.com/ConnorSimmonds/server/errors"
+	errlib "github.com/ConnorSimmonds/server/errors"
 	maplib "github.com/ConnorSimmonds/server/map"
 	user "github.com/ConnorSimmonds/server/user"
 	"net"
@@ -42,6 +42,7 @@ func handleConnection(conn net.Conn) {
 	var dungeonID uint16
 	var mapNum uint16
 	var currentMap *os.File
+	var filename string
 	byteArray := make([]byte, 1024)
 
 	fmt.Println("Waiting for response from " + conn.RemoteAddr().String())
@@ -81,15 +82,17 @@ Loop:
 			maplib.UpdateMap(x, y, value, currentMap)
 			break
 		case 13:
-			currentMap, err = maplib.OpenMap(userID, dungeonID, mapNum)
-			if err != nil { //Let's do some error handling
-				if err == errorLibrary.ReturnMapFileError() { //The map doesn't exist! Let's get the map from the client
-					sendPacket(clientWrite, conn, []byte{12})
-				}
+			var er *errlib.FileNotFoundError
+			currentMap, er = maplib.OpenMap(userID, dungeonID, mapNum)
+			if er != nil {
+				filename = er.File
+				sendPacket(clientWrite, conn, []byte{12})
 			}
+
 			break
 		case 14:
-			currentMap = maplib.CreateMap("", 0, 0)
+			fmt.Println(filename)
+			currentMap = maplib.CreateMap("Maps/1/map1_1.dng", 5, 5)
 			break
 		}
 	}

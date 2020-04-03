@@ -1,26 +1,22 @@
 package errors
 
 import (
-	"errors"
 	"fmt"
 )
 
-type MapError struct {
-	err  error
-	code uint8
+type FileNotFoundError struct {
+	File string
+	Err  error
 }
 
-func (m MapError) Error() string {
-	return fmt.Sprintf("map: %v", m.err)
+func (m FileNotFoundError) Error() string {
+	return fmt.Sprintf("map: %v", m.File+m.Err.Error())
 }
 
-func ReturnMapFileError() *MapError {
-	return &MapError{
-		errors.New("FileNotFound"),
-		0,
-	}
+func (m FileNotFoundError) getFile() string {
+	return m.File
 }
 
-func ReturnMapNil() *MapError {
-	return nil
+func MapFileNotFoundError(file string, err error) *FileNotFoundError {
+	return &FileNotFoundError{file, err}
 }
