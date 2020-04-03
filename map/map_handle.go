@@ -19,11 +19,12 @@ func checkError(e error) {
 //Updates the map at the position of arguments x, y with the value of argument value
 func UpdateMap(x uint8, y uint8, value uint8, currentMap *os.File) {
 	//firstly, let's get the width/height
-	currentMap.Seek(0, 0) //reset back to the beginning
+	_, err := currentMap.Seek(0, 0) //reset back to the beginning
+	checkError(err)
 	w := make([]byte, 1)
 	h := make([]byte, 1)
 
-	_, err := currentMap.Read(w)
+	_, err = currentMap.Read(w)
 	checkError(err)
 	_, err = currentMap.ReadAt(h, 1)
 	checkError(err)
@@ -63,15 +64,14 @@ func OpenMap(userID uint32, dungeonID uint16, mapNum uint16) (*os.File, *errlib.
 //Creates the map file
 func CreateMap(filename string, x uint8, y uint8) *os.File {
 	returnFile, e := os.Create(filename)
-	if e != nil { //We encountered an error we weren't supposed to!
-		//we'll attempt to handle it
-		panic(e) //Flip out and panic!
-	}
-	returnFile.Write([]byte{x, y})
+	checkError(e)
+	_, e = returnFile.Write([]byte{x, y})
+	checkError(e)
 	//We now fill it with dummy characters, and put the x/y values in the header
 	for i := 0; i < int(x); i++ {
 		for i2 := 0; i2 < int(y); i2++ {
-			returnFile.Write([]byte{0})
+			_, e = returnFile.Write([]byte{0})
+			checkError(e)
 		}
 	}
 	return returnFile //return the file
