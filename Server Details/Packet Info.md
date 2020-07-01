@@ -16,7 +16,7 @@ For Example, a ping packet will simply be "1" with no other arguments. If it rec
 #Receiving
 | Packet Name | Packet Description | OP Code (Int8)| Arguments
 |-------------|--------------------|---------|----------
-|Init. Connection|Initializes the connection between the server and client. First part is initialized from the client - after the initial connection, it "logs in" with the User ID.|0|User ID (uint32)
+|Init. Connection|Initializes the connection between the server and client. First part is initialized from the client - after the initial connection, it "logs in" with the User ID. If no user ID is provided, then it sends a user ID.|0|User ID (uint32)
 |Ping|Pings the server.|1|n/a
 |Quit|Closes the connection.|2|n/a
 |Map Update|Updates the map.|10|X (uint8) , Y (uint8), Updated Value (uint8)
@@ -26,13 +26,17 @@ For Example, a ping packet will simply be "1" with no other arguments. If it rec
 |Map Create|Tells the server the size of the map. We do not need to resend the  dungeon or floor, as this will always follow Map Open.|14|X (unint8), Y (unint8)
 |Dungeon Update|Updates the current dungeon and floor the player is in.|20|Dungeon ID  (unint16), Map ID  (unint16)|
 |Floor Update|Updates the current floor the player is in.|21|Map ID (uint16)
-
+|Party Member Init Edit|Tells the server that to start queueing up any edits to the party.|30|n/a
+|Party Member Create|Creates a level 1 party member in the database.|31|Name, Class, Portrait
+|Party Member Update|Updates the party member details in the database.|32|Internal ID, current level, current total exp
+|Party Member Finish Edit|Finishes the party edits, and gets the server to process the changes.|39|n/a
 #Sending
 | Packet Name | Packet Description | OP Code (Int8)| Arguments
 |-------------|--------------------|---------|----------
-|Init. Connection|Finishes the initialization. Confirms that the client is properly |0|Error Code
+|Init. Connection|Finishes the initialization. Confirms that the client is properly logged in.|0|Error Code
 |Ping|Pings the client.|1|n/a
 |Quit|Closes the connection.|2|n/a
+|User ID|Gives the client the user ID to use (if none was given)|3|uint32 id
 |Map Update|Updates the map.|10|X, Y, Updated Value
 |Map Send|Sends the map file to the client.|11|Map File
 |Map Create|Requests the map details so it may create the file|12|n/a
