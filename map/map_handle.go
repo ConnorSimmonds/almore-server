@@ -49,7 +49,7 @@ func OpenMap(userID uint32, dungeonID uint16, mapNum uint16) (*os.File, *errlib.
 	fileFormat := ".dng"
 	stringBuilder.WriteString("Maps/")
 	//Now we add our ints into our builder
-	stringBuilder.WriteString(strconv.FormatUint(uint64(userID), 10) + "/" + strconv.FormatUint(uint64(dungeonID), 10) + "_" + strconv.FormatUint(uint64(mapNum), 10) + fileFormat)
+	stringBuilder.WriteString(strconv.FormatUint(uint64(userID), 10) + "/map" + strconv.FormatUint(uint64(dungeonID), 10) + "_" + strconv.FormatUint(uint64(mapNum), 10) + fileFormat)
 	file, fileError := os.OpenFile(stringBuilder.String(), os.O_RDWR, os.ModePerm)
 	if fileError != nil {
 		//There's been some kind of error, record it in the appropriate debug log (with a timestamp) and then create the map (failsafe)

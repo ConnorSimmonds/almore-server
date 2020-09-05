@@ -2,15 +2,17 @@ package main
 
 import (
 	"bytes"
+	"database/sql"
+	"encoding/binary"
 	"fmt"
 	errlib "github.com/ConnorSimmonds/server/errors"
 	maplib "github.com/ConnorSimmonds/server/map"
 	user "github.com/ConnorSimmonds/server/user"
+	_ "github.com/go-sql-driver/mysql"
+	"log"
 	"net"
 	"os"
 )
-
-import _ "github.com/go-sql-driver/mysql"
 
 func main() {
 	//Do note that this is literally copy/pasted from the GO documentation
@@ -43,6 +45,7 @@ func handleConnection(conn net.Conn) {
 	var mapNum uint16
 	var currentMap *os.File
 	var filename string
+	var db *sql.DB
 	byteArray := make([]byte, 1024)
 
 	fmt.Println("Waiting for response from " + conn.RemoteAddr().String())
@@ -59,7 +62,7 @@ Loop:
 		clientRead.Write(byteArray)
 		clientCode := clientRead.Next(1)
 
-		//Note that this just handles receiving data - the actual proper logic is done elsewhere.
+		//Note that this just handles receiving data - the actual proper logic is done elsewhere for most packets
 		switch clientCode[0] {
 		case 0:
 			userID = user.InitUser(clientRead.Next(4))
@@ -83,17 +86,41 @@ Loop:
 			break
 		case 13:
 			var er *errlib.FileNotFoundError
+			dungeonID = binary.LittleEndian.Uint16(clientRead.Next(2))
+			mapNum = binary.LittleEndian.Uint16(clientRead.Next(2))
+			fmt.Println("Opening map" + string(dungeonID) + "_" + string(mapNum))
+
 			currentMap, er = maplib.OpenMap(userID, dungeonID, mapNum)
 			if er != nil {
 				filename = er.File
 				sendPacket(clientWrite, conn, []byte{12})
 			}
-
 			break
 		case 14:
-			currentMap = maplib.CreateMap(filename, 5, 5)
+			//Create the map, getting the map x/y values from the client
+			//Put values into local variables
+			x := clientRead.Next(2)[0]
+			y := clientRead.Next(2)[0]
+			currentMap = maplib.CreateMap(filename, x, y)
 			break
+
+		case 20:
+			break
+		case 21:
+			break
+		case 30:
+			db, err = sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/hello")
+			if err != nil {
+				log.Fatal(err)
+			}
+			break
+		case 39:
+			err = db.Close()
+			if err != nil {
+				//something went wrong while closing the db - look up how to do this
+			}
 		}
+
 	}
 }
 
