@@ -84,39 +84,35 @@ Loop:
 			value := clientRead.Next(1)[0]
 			maplib.UpdateMap(x, y, value, currentMap)
 			break
-		case 13:
+		case 13: //Open the map, with the dungeonID/mapNum given. If we weren't given it, then we see if the client provided it.
 			var er *errlib.FileNotFoundError
 			if dungeonID == 0 || mapNum == 0 { //since we haven't updated our dungeonID or mapNum, see if we've been passed some
 				dungeonID = binary.LittleEndian.Uint16(clientRead.Next(2))
 				mapNum = binary.LittleEndian.Uint16(clientRead.Next(2))
 			}
-			fmt.Println("Opening map" + string(dungeonID) + "_" + string(mapNum))
-
 			currentMap, er = maplib.OpenMap(userID, dungeonID, mapNum)
 			if er != nil {
 				filename = er.File
 				sendPacket(clientWrite, conn, []byte{12})
 			}
 			break
-		case 14:
-			//Create the map, getting the map x/y values from the client
-			//Put values into local variables
-			x := clientRead.Next(2)[0]
-			y := clientRead.Next(2)[0]
+		case 14: //Create the map, getting the map x/y values from the client
+			x := clientRead.Next(1)[0]
+			y := clientRead.Next(1)[0]
 			if filename == "" {
 				//there's been an error of some sort: we cannot have gotten to this point WITHOUT encountering an error
 				//break but maybe send a packet to the client explaining the error?
+				fmt.Println("Error - cannot find filename.")
 				break
 			}
 			currentMap = maplib.CreateMap(filename, x, y)
 			break
 
 		case 20:
-			dungeonID = binary.LittleEndian.Uint16(clientRead.Next(2))
-			mapNum = binary.LittleEndian.Uint16(clientRead.Next(2))
-			break
+			dungeonID = binary.LittleEndian.Uint16(clientRead.Next(2)) //fall through to next statement, as they both result in the same outcome
 		case 21:
 			mapNum = binary.LittleEndian.Uint16(clientRead.Next(2))
+			currentMap.Close() //close our map
 			break
 		case 22:
 			dungeonID = 0
@@ -151,6 +147,7 @@ Loop:
 		}
 
 	}
+	currentMap.Close() //close our map
 }
 
 func sendPacket(buffer bytes.Buffer, conn net.Conn, packetDetails []byte) {
