@@ -46,6 +46,7 @@ func handleConnection(conn net.Conn) {
 	var currentMap *os.File
 	var filename string
 	var db *sql.DB
+	var dbCache bool
 	byteArray := make([]byte, 1024)
 
 	fmt.Println("Waiting for response from " + conn.RemoteAddr().String())
@@ -109,11 +110,26 @@ Loop:
 		case 21:
 			break
 		case 30:
-			db, err = sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/hello")
+			db, err = sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/labyrinth")
 			if err != nil {
 				log.Fatal(err)
 			}
+			err = db.Ping() //ping the database, to make sure there's no errors
+			if err != nil {
+				//The database was not set up properly, so figure out what's wrong and act from there.
+			}
 			break
+		case 31: //Tells the server to start caching any and all changes to the party members.
+			//This is to reduce the amount of DB calls we make.
+			dbCache = true
+			break
+
+		case 38:
+			if dbCache { //changes have been stored, so apply them
+
+			} else {
+				//let the client know that changes haven't even started initializing
+			}
 		case 39:
 			err = db.Close()
 			if err != nil {
