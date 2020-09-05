@@ -26,10 +26,12 @@ For Example, a ping packet will simply be "1" with no other arguments. If it rec
 |Map Create|Tells the server the size of the map. We do not need to resend the  dungeon or floor, as this will always follow Map Open.|14|X (unint8), Y (unint8)
 |Dungeon Update|Updates the current dungeon and floor the player is in.|20|Dungeon ID  (unint16), Map ID  (unint16)|
 |Floor Update|Updates the current floor the player is in.|21|Map ID (uint16)
-|Party Member Init Edit|Tells the server that to start queueing up any edits to the party.|30|n/a
-|Party Member Create|Creates a level 1 party member in the database.|31|Name, Class, Portrait
-|Party Member Update|Updates the party member details in the database.|32|Internal ID, current level, current total exp
-|Party Member Finish Edit|Finishes the party edits, and gets the server to process the changes.|39|n/a
+|Database Init|Tells the server that to start up the database.|30|n/a
+|Party Member Init Changes|Tells the server to start caching changes to any party member.|31|n/a
+|Party Member Create|Creates a level 1 party member in the database.|32|Name, Class, Portrait
+|Party Member Update|Updates the party member details in the database.|33|Internal ID, current level, current total exp
+|Party Member Finish|Tells the server to apply all changes to the party member(s).|n/a
+|Database Finish|Tells the server to close the database.|39|n/a
 #Sending
 | Packet Name | Packet Description | OP Code (Int8)| Arguments
 |-------------|--------------------|---------|----------
