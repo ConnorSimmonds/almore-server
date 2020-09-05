@@ -41,8 +41,8 @@ func handleConnection(conn net.Conn) {
 
 	//Some basic values for gameplay purposes
 	var userID uint32
-	var dungeonID uint16
-	var mapNum uint16
+	var dungeonID uint16 = 0
+	var mapNum uint16 = 0
 	var currentMap *os.File
 	var filename string
 	var db *sql.DB
@@ -64,18 +64,17 @@ Loop:
 		clientCode := clientRead.Next(1)
 
 		//Note that this just handles receiving data - the actual proper logic is done elsewhere for most packets
+		//This is also a terrible way of handling it, I feel.
 		switch clientCode[0] {
 		case 0:
 			userID = user.InitUser(clientRead.Next(4))
-			fmt.Printf("Found user %d", userID)
 			sendPacket(clientWrite, conn, []byte{0})
 			break
 		case 2:
 			sendPacket(clientWrite, conn, []byte{2})
-			fmt.Println("Closed connection with client.")
 			break Loop
 		case 1:
-			fmt.Println("Received 'ping' from " + conn.RemoteAddr().String())
+			//fmt.Println("Received 'ping' from " + conn.RemoteAddr().String())
 			sendPacket(clientWrite, conn, []byte{1})
 			break
 		case 10:
@@ -87,8 +86,10 @@ Loop:
 			break
 		case 13:
 			var er *errlib.FileNotFoundError
-			dungeonID = binary.LittleEndian.Uint16(clientRead.Next(2))
-			mapNum = binary.LittleEndian.Uint16(clientRead.Next(2))
+			if dungeonID == 0 || mapNum == 0 { //since we haven't updated our dungeonID or mapNum, see if we've been passed some
+				dungeonID = binary.LittleEndian.Uint16(clientRead.Next(2))
+				mapNum = binary.LittleEndian.Uint16(clientRead.Next(2))
+			}
 			fmt.Println("Opening map" + string(dungeonID) + "_" + string(mapNum))
 
 			currentMap, er = maplib.OpenMap(userID, dungeonID, mapNum)
@@ -102,12 +103,24 @@ Loop:
 			//Put values into local variables
 			x := clientRead.Next(2)[0]
 			y := clientRead.Next(2)[0]
+			if filename == "" {
+				//there's been an error of some sort: we cannot have gotten to this point WITHOUT encountering an error
+				//break but maybe send a packet to the client explaining the error?
+				break
+			}
 			currentMap = maplib.CreateMap(filename, x, y)
 			break
 
 		case 20:
+			dungeonID = binary.LittleEndian.Uint16(clientRead.Next(2))
+			mapNum = binary.LittleEndian.Uint16(clientRead.Next(2))
 			break
 		case 21:
+			mapNum = binary.LittleEndian.Uint16(clientRead.Next(2))
+			break
+		case 22:
+			dungeonID = 0
+			mapNum = 0
 			break
 		case 30:
 			db, err = sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/labyrinth")
