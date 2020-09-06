@@ -85,8 +85,12 @@ Loop:
 			maplib.UpdateMap(x, y, value, currentMap)
 			break
 		case 12:
-			var mapArray = maplib.SendMap(currentMap)
+			mapArray, er := maplib.SendMap(currentMap)
 			//Create the packet out of the array
+			if er != nil {
+				//there's been an issue - tell the client that such has happened
+				sendPacket(clientWrite, conn, []byte{13})
+			}
 			sendPacketData(clientWrite, conn, 11, mapArray)
 			break
 		case 13: //Open the map, with the dungeonID/mapNum given. If we weren't given it, then we see if the client provided it.

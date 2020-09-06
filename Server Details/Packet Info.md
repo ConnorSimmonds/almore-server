@@ -43,3 +43,4 @@ For Example, a ping packet will simply be "1" with no other arguments. If it rec
 |Map Update|Updates the map.|10|X, Y, Updated Value
 |Map Send|Sends the map file to the client.|11|Map File
 |Map Create|Requests the map details so it may create the file|12|n/a
+|Map Error|Tells the client that an error has occurred while requesting the map|13|(Error Code)
