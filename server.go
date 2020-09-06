@@ -84,6 +84,11 @@ Loop:
 			value := clientRead.Next(1)[0]
 			maplib.UpdateMap(x, y, value, currentMap)
 			break
+		case 12:
+			var mapArray = maplib.SendMap(currentMap)
+			//Create the packet out of the array
+			sendPacketData(clientWrite, conn, 11, mapArray)
+			break
 		case 13: //Open the map, with the dungeonID/mapNum given. If we weren't given it, then we see if the client provided it.
 			var er *errlib.FileNotFoundError
 			if dungeonID == 0 || mapNum == 0 { //since we haven't updated our dungeonID or mapNum, see if we've been passed some
@@ -112,20 +117,24 @@ Loop:
 			dungeonID = binary.LittleEndian.Uint16(clientRead.Next(2)) //fall through to next statement, as they both result in the same outcome
 		case 21:
 			mapNum = binary.LittleEndian.Uint16(clientRead.Next(2))
-			currentMap.Close() //close our map
+			err := currentMap.Close() //close our map
+			if err != nil {
+				//TODO: handle this properly
+			}
 			break
 		case 22:
 			dungeonID = 0
 			mapNum = 0
 			break
 		case 30:
-			db, err = sql.Open("mysql", "user:password@tcp(127.0.0.1:3306)/labyrinth")
+			db, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/labyrinth")
 			if err != nil {
 				log.Fatal(err)
 			}
 			err = db.Ping() //ping the database, to make sure there's no errors
 			if err != nil {
 				//The database was not set up properly, so figure out what's wrong and act from there.
+				//TODO: handle it properly, in other words
 			}
 			break
 		case 31: //Tells the server to start caching any and all changes to the party members.
@@ -147,10 +156,23 @@ Loop:
 		}
 
 	}
-	currentMap.Close() //close our map
+	err := currentMap.Close() //close our map
+	if err != nil {
+		//TODO: handle this properly
+	}
 }
 
 func sendPacket(buffer bytes.Buffer, conn net.Conn, packetDetails []byte) {
+	fmt.Println(buffer)
 	buffer.Write(packetDetails)
+	fmt.Println(buffer)
+	_, _ = conn.Write(buffer.Bytes())
+}
+
+func sendPacketData(buffer bytes.Buffer, conn net.Conn, opcode byte, packetDetails []byte) {
+	fmt.Println(buffer)
+	buffer.WriteByte(opcode)
+	buffer.Write(packetDetails)
+	fmt.Println(buffer)
 	_, _ = conn.Write(buffer.Bytes())
 }

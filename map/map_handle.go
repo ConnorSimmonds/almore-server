@@ -76,3 +76,19 @@ func CreateMap(filename string, x uint8, y uint8) *os.File {
 	}
 	return returnFile //return the file
 }
+
+func SendMap(currentMap *os.File) []byte { //Creates a byte array which will then be returned. This contains the map file
+	_, err := currentMap.Seek(0, 0) //reset file
+	checkError(err)
+	w := make([]byte, 1)
+	h := make([]byte, 1)
+
+	_, err = currentMap.Read(w)
+	checkError(err)
+	_, err = currentMap.ReadAt(h, 1)
+	checkError(err)
+	byteArray := make([]byte, w[0]*h[0])
+	_, err = currentMap.Read(byteArray) //append the file to the byte array, which is the same size as our map file
+	checkError(err)
+	return byteArray
+}
