@@ -90,8 +90,9 @@ Loop:
 			if er != nil {
 				//there's been an issue - tell the client that such has happened
 				sendPacket(clientWrite, conn, []byte{13})
+			} else {
+				sendPacketData(clientWrite, conn, 11, mapArray)
 			}
-			sendPacketData(clientWrite, conn, 11, mapArray)
 			break
 		case 13: //Open the map, with the dungeonID/mapNum given. If we weren't given it, then we see if the client provided it.
 			var er *errlib.FileNotFoundError
