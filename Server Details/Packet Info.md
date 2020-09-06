@@ -31,7 +31,7 @@ For Example, a ping packet will simply be "1" with no other arguments. If it rec
 |Party Member Init Changes|Tells the server to start caching changes to any party member.|31|n/a
 |Party Member Create|Creates a level 1 party member in the database.|32|Name, Class, Portrait
 |Party Member Update|Updates the party member details in the database.|33|Internal ID, current level, current total exp
-|Party Member Finish|Tells the server to apply all changes to the party member(s).|n/a
+|Party Member Finish|Tells the server to apply all changes to the party member(s).|38|n/a
 |Database Finish|Tells the server to close the database.|39|n/a
 #Sending
 | Packet Name | Packet Description | OP Code (Int8)| Arguments
