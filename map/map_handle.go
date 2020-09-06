@@ -88,7 +88,7 @@ func SendMap(currentMap *os.File) ([]byte, error) { //Creates a byte array which
 	_, err = currentMap.ReadAt(h, 1)
 	checkError(err)
 	byteArray := make([]byte, w[0]*h[0])
-	_, err = currentMap.Read(byteArray) //append the file to the byte array, which is the same size as our map file
+	_, err = currentMap.ReadAt(byteArray, 2) //append the file to the byte array, which is the same size as our map file
 	if err != nil {
 		return nil, err
 	}

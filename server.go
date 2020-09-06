@@ -168,16 +168,12 @@ Loop:
 }
 
 func sendPacket(buffer bytes.Buffer, conn net.Conn, packetDetails []byte) {
-	fmt.Println(buffer)
 	buffer.Write(packetDetails)
-	fmt.Println(buffer)
 	_, _ = conn.Write(buffer.Bytes())
 }
 
 func sendPacketData(buffer bytes.Buffer, conn net.Conn, opcode byte, packetDetails []byte) {
-	fmt.Println(buffer)
 	buffer.WriteByte(opcode)
 	buffer.Write(packetDetails)
-	fmt.Println(buffer)
 	_, _ = conn.Write(buffer.Bytes())
 }
