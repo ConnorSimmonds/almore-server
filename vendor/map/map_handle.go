@@ -4,7 +4,7 @@ package _map
 
 import (
 	"fmt"
-	errlib "github.com/ConnorSimmonds/server/errors"
+	errlib "errors"
 	"os"
 	"strconv"
 	"strings"

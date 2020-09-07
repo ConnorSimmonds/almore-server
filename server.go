@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/binary"
+	errlib "errors"
 	"fmt"
-	errlib "github.com/ConnorSimmonds/server/errors"
-	maplib "github.com/ConnorSimmonds/server/map"
-	user "github.com/ConnorSimmonds/server/user"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	maplib "map"
 	"net"
 	"os"
+	user "user"
 )
 
 func main() {
