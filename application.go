@@ -10,6 +10,7 @@ import (
 	maplib "map"
 	"net"
 	"os"
+	"user"
 )
 
 func main() {
@@ -65,7 +66,7 @@ Loop:
 		//This is also a terrible way of handling it, I feel.
 		switch clientCode[0] {
 		case 0:
-			//userID = user.InitUser(clientRead.Next(4))
+			userID = user.InitUser(clientRead.Next(4))
 			sendPacket(clientWrite, conn, []byte{0})
 			break
 		case 2:
