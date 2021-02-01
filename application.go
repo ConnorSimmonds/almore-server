@@ -2,11 +2,10 @@ package main
 
 import (
 	"bytes"
-	"database/sql"
+	datalib "database"
 	"encoding/binary"
 	errlib "errors"
 	"fmt"
-	"log"
 	maplib "map"
 	"net"
 	"os"
@@ -44,8 +43,6 @@ func handleConnection(conn net.Conn) {
 	var mapNum uint16 = 0
 	var currentMap *os.File
 	var filename string
-	var db *sql.DB
-	var dbCache bool
 	byteArray := make([]byte, 1024)
 
 	fmt.Println("Waiting for response from " + conn.RemoteAddr().String())
@@ -130,33 +127,16 @@ Loop:
 			dungeonID = 0
 			mapNum = 0
 			break
-		case 30:
-			db, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/labyrinth")
-			if err != nil {
-				log.Fatal(err)
-			}
-			err = db.Ping() //ping the database, to make sure there's no errors
-			if err != nil {
-				//The database was not set up properly, so figure out what's wrong and act from there.
-				//TODO: handle it properly, in other words
-			}
+		case 30: //Open a connection to the db
+			datalib.AccessDatabase()
 			break
 		case 31: //Tells the server to start caching any and all changes to the party members.
 			//This is to reduce the amount of DB calls we make.
-			dbCache = true
-			break
-
-		case 38:
-			if dbCache { //changes have been stored, so apply them
-
-			} else {
-				//let the client know that changes haven't even started initializing
-			}
-		case 39:
-			err = db.Close()
-			if err != nil {
-				//something went wrong while closing the db - look up how to do this
-			}
+			datalib.CacheChanges()
+		case 38: //Apply all changes done to the DB
+			datalib.ApplyChanges()
+		case 39: //Close the DB
+			datalib.CloseDatabase()
 		}
 
 	}
