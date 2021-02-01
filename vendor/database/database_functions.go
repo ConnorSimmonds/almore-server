@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"time"
 )
 
 type change struct {
@@ -14,14 +15,19 @@ var db *sql.DB
 var dbCache bool
 
 func AccessDatabase() {
-	db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/labyrinth")
+	db, err := sql.Open("mysql", "root:password@/labyrinth")
 	if err != nil {
 		log.Fatal(err)
 	}
+	//Set up important settings as per https://github.com/go-sql-driver/mysql/
+	db.SetConnMaxLifetime(time.Minute * 3)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
+
 	err = db.Ping() //ping the database, to make sure there's no errors
 	if err != nil {
 		//The database was not set up properly, so figure out what's wrong and act from there.
-		//TODO: handle it properly, in other words
+		//TODO: handle it properly, in other words, actually look into how to fix this
 	}
 }
 
